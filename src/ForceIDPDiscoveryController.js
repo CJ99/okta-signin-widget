@@ -37,7 +37,7 @@ export default BaseLoginController.extend({
     options.appState.settings.authClient
       .webfinger(webfingerArgs)
       .then(res => {
-        if (res && res.links && res.links[0]) {
+        if (res?.links && res.links[0]) {
           if (res.links[0].properties['okta:idp:type'] !== OKTA_IDP_TYPE && res.links[0].href) {
             const redirectFn = res.links[0].href.includes('OKTA_INVALID_SESSION_REPOST%3Dtrue')
               ? Util.redirectWithFormGet.bind(Util)
