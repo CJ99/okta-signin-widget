@@ -42,6 +42,7 @@ import EnrollmentLinkSentController from 'EnrollmentLinkSentController';
 import EnterPasscodePushFlowController from 'EnterPasscodePushFlowController';
 import ForgotPasswordController from 'ForgotPasswordController';
 import IDPDiscoveryController from 'IDPDiscoveryController';
+import ForceIDPDiscoveryController from 'ForceIDPDiscoveryController';
 import ManualSetupPushController from 'ManualSetupPushController';
 import ManualSetupTotpController from 'ManualSetupTotpController';
 import MfaVerifyController from 'MfaVerifyController';
@@ -139,6 +140,7 @@ export default BaseLoginRouter.extend({
     'signin/enroll-user': 'enrollUser',
     'signin/device-activate-complete': 'deviceActivateComplete',
     'signin/device-activate': 'deviceActivate',
+    'signin/idp-discovery-check': 'idpDiscoveryCheck',
     '*wildcard': 'defaultAuth',
   },
 
@@ -157,6 +159,10 @@ export default BaseLoginRouter.extend({
     'errorState',
     'verifyPIV',
   ],
+
+  idpDiscoveryCheck: function() {
+    this.render(ForceIDPDiscoveryController, { Beacon: SecurityBeacon });
+  },
 
   defaultAuth: function() {
     if (location.hash === `#${Enums.WIDGET_CONTAINER_ID}`) {

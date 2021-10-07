@@ -761,6 +761,15 @@ export default Model.extend({
         return res._embedded.deviceActivationStatus;
       },
     },
+    forceIdpDiscovery: {
+      deps: ['lastAuthResponse'],
+      fn: function(res) {
+        if (!res._embedded) {
+          return null;
+        }
+        return res._embedded.forceIdpDiscovery;
+      },
+    },
   },
 
   parse: function(options) {
