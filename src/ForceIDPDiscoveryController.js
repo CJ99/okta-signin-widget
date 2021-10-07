@@ -22,21 +22,23 @@ export default BaseLoginController.extend({
   Model: {},
 
   initialize: function() {
-    let options = this.options;
+    const OKTA_IDP_TYPE = 'OKTA';
+    const RESOURCE = 'okta:acct:';
+
+    const options = this.options;
     const lastAuthResponse = options.appState.get('lastAuthResponse');
     const stateToken = lastAuthResponse && lastAuthResponse?.stateToken;
 
     const webfingerArgs = {
-      resource: 'okta:acct:undefined',
+      resource: RESOURCE,
       requestContext: stateToken,
     };
 
-    const authClient = options.appState.settings.authClient;
-    authClient
+    options.appState.settings.authClient
       .webfinger(webfingerArgs)
       .then(res => {
         if (res && res.links && res.links[0]) {
-          if (res.links[0].properties['okta:idp:type'] !== 'OKTA' && res.links[0].href) {
+          if (res.links[0].properties['okta:idp:type'] !== OKTA_IDP_TYPE && res.links[0].href) {
             const redirectFn = res.links[0].href.includes('OKTA_INVALID_SESSION_REPOST%3Dtrue')
               ? Util.redirectWithFormGet.bind(Util)
               : this.settings.get('redirectUtilFn');
@@ -44,13 +46,13 @@ export default BaseLoginController.extend({
             //it will be encoded since it will be included in the encoded fromURI
 
             redirectFn(res.links[0].href);
-          } else {
-            options.appState.trigger('navigate', '');
+            return;
           }
         }
+        options.appState.trigger('navigate', '');
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
+        options.appState.trigger('navigate', '');
       });
   },
 
