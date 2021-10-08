@@ -25,14 +25,14 @@ export default function LoginCallback() {
 
     if (authClient.token.isLoginRedirect()) {
       authClient.token.parseFromUrl()
-          .then(function (res) {
-            setTokens(res.tokens);
-            setCode(res.code);
-          })
-          .catch(function (err) {
-            console.log(err);
-          })
-          .finally(() => history.push('/'));
+        .then(function(res) {
+          setTokens(res.tokens);
+          setCode(res.code);
+        })
+        .catch(function(err) {
+          console.log(err);
+        })
+        .finally(() => history.push('/'));
     }
   }, []);
 

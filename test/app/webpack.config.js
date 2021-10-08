@@ -61,4 +61,4 @@ module.exports = {
       'process.env': JSON.stringify(ENV.getValues())
     })
   ]
-}
+};

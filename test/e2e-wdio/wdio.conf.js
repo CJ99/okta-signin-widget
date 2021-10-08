@@ -1,3 +1,4 @@
+/* eslint-disable */
 const path = require('path');
 require('./env').config();
 
@@ -20,7 +21,7 @@ if (process.env.CI) {
     ]);
 }
 
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '89.0.4389.23';
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '87.0.4280.88';
 const drivers = {
     chrome: { version: CHROMEDRIVER_VERSION }
 };

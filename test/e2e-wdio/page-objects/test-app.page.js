@@ -1,32 +1,32 @@
 import assert from 'assert';
-import { waitForLoad } from "../util/waitUtil"
+import { waitForLoad } from '../util/waitUtil';
 
 const { WIDGET_TEST_SERVER } = process.env;
 
 class TestAppPage {
-  get widget () { return $('#okta-sign-in') }
-  get configEditor () { return $('#config-editor') }
-  get tokens () { return $('#tokens-container') }
-  get code () { return $('#code-container') }
-  get cspErrors () { return $('#csp-errors-container') }
-  get oidcError () { return $('#oidc-error-container') }
+  get widget() { return $('#okta-sign-in'); }
+  get configEditor() { return $('#config-editor'); }
+  get tokens() { return $('#tokens-container'); }
+  get code() { return $('#code-container'); }
+  get cspErrors() { return $('#csp-errors-container'); }
+  get oidcError() { return $('#oidc-error-container'); }
 
   // widget general elements
-  get widgetTitle () { return $('[data-se="o-form-head"]') }
-  get submit () { return $('[data-type="save"]') }
+  get widgetTitle() { return $('[data-se="o-form-head"]'); }
+  get submit() { return $('[data-type="save"]'); }
 
   // actions
-  get startButton () { return $('button[name="start"]') }
-  get hideButton () { return $('button[name="hide"]') }
-  get showButton () { return $('button[name="show"]') }
-  get removeButton () { return $('button[name="remove"]') }
-  get showSignInAndRedirect () { return $('button[name="showSignInAndRedirect"]') }
-  get showSignInToGetTokens () { return $('button[name="showSignInToGetTokens"]') }
-  get startWithRenderEl () { return $('button[name="renderEl"]') }
-  get triggerCspFail () { return $('button[name="fail-csp"]') }
+  get startButton() { return $('button[name="start"]'); }
+  get hideButton() { return $('button[name="hide"]'); }
+  get showButton() { return $('button[name="show"]'); }
+  get removeButton() { return $('button[name="remove"]'); }
+  get showSignInAndRedirect() { return $('button[name="showSignInAndRedirect"]'); }
+  get showSignInToGetTokens() { return $('button[name="showSignInToGetTokens"]'); }
+  get startWithRenderEl() { return $('button[name="renderEl"]'); }
+  get triggerCspFail() { return $('button[name="fail-csp"]'); }
 
   
-  async open (path = '') {
+  async open(path = '') {
     return browser.url(`http://localhost:3000/${path}`);
   }
 
@@ -65,7 +65,7 @@ class TestAppPage {
     await waitForLoad(this.tokens);
     await this.tokens.then(el => el.getText()).then(txt => {
       assert(txt.includes('accessToken'));
-      assert(txt.includes(`"tokenType": "Bearer"`));
+      assert(txt.includes('"tokenType": "Bearer"'));
     });
   }
 

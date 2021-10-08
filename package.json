@@ -104,6 +104,8 @@
     "eslint-plugin-json": "^2.1.2",
     "eslint-plugin-local-rules": "^0.1.1",
     "eslint-plugin-no-only-tests": "^2.4.0",
+    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-webdriverio": "^1.0.1",
     "fibers": "^5.0.0",
     "file-loader": "^6.2.0",
     "fs-extra": "^8.1.0",

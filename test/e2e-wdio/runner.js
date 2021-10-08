@@ -3,10 +3,10 @@ const spawn = require('cross-spawn-with-kill');
 const waitOn = require('wait-on');
 require('./env').config();
 
-const getTask = (config) => () => {
+const getTask = () => () => {
   return new Promise(resolve => {
     // start the dev server
-    const server = spawn(`yarn`, [
+    const server = spawn('yarn', [
       'start:test:app'
     ], { stdio: 'inherit' });
 
@@ -30,12 +30,12 @@ const getTask = (config) => () => {
       );
 
       let returnCode = 1;
-      runner.on('exit', function (code) {
+      runner.on('exit', function(code) {
         console.log('Test runner exited with code: ' + code);
         returnCode = code;
         server.kill();
       });
-      runner.on('error', function (err) {
+      runner.on('error', function(err) {
         server.kill();
         throw err;
       });
@@ -49,6 +49,20 @@ const getTask = (config) => () => {
 
 // track process returnCode for each task
 const codes = [];
+
+const tasks = [
+  // {
+  //   bundle: 'npm',
+  // },
+  {
+    bundle: 'cdn'
+  }
+]
+  .reduce((tasks, config) => {
+    const task = getTask(config);
+    tasks.push(task);
+    return tasks;
+  }, []);
 
 function runNextTask() {
   if (tasks.length === 0) {
@@ -66,20 +80,7 @@ function runNextTask() {
     runNextTask();
   });
 }
-
-const tasks = [
-  // {
-  //   bundle: 'npm',
-  // },
-  {
-    bundle: 'cdn'
-  }
-]
-  .reduce((tasks, config) => {
-    const task = getTask(config);
-    tasks.push(task);
-    return tasks;
-  }, []);
+  
 
 runNextTask();
 

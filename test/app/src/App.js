@@ -28,7 +28,7 @@ function App() {
   useEffect(() => {
     document.addEventListener('securitypolicyviolation', handleCsp);
     return () => document.removeEventListener('securitypolicyviolation', handleCsp);
-  }, [])
+  }, []);
 
   const handleConfigChange = (e) => {
     const newConfigStr = e.target.value;
@@ -39,7 +39,7 @@ function App() {
     } catch (e) {
       // do nothing, only render preview when config is ready as JSON format
     }
-  }
+  };
 
   return (
     <AppContext.Provider value={{ 
@@ -60,10 +60,10 @@ function App() {
         />
         { config && (
           <>
-          <h4>Config Preview</h4>
-          <pre id="widget-config-preview">
-            { JSON.stringify(config, null ,2)}
-          </pre>
+            <h4>Config Preview</h4>
+            <pre id="widget-config-preview">
+              { JSON.stringify(config, null ,2)}
+            </pre>
           </>
         )}
       </div>
@@ -82,7 +82,7 @@ function App() {
 
       <div id="csp-errors-container">
         {cspErrors.map(err => (
-          <>{err.blockedURI + " blocked due to CSP rule " + err.violatedDirective + " from " + err.originalPolicy}</>
+          <>{err.blockedURI + ' blocked due to CSP rule ' + err.violatedDirective + ' from ' + err.originalPolicy}</>
         ))}
       </div>
 
@@ -98,4 +98,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

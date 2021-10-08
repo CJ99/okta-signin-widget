@@ -1,26 +1,22 @@
 import { waitForLoad } from '../util/waitUtil';
 
 class PrimaryLoginPage {
-  get username () { return $('input[name="username"]') }
-  get password () { return $('input[name="password"]') }
-  get errorBox () { return $('.okta-form-infobox-error') }
-  get submit () { return $('[data-type="save"]') }
+  get username() { return $('input[name="username"]'); }
+  get password() { return $('input[name="password"]'); }
+  get errorBox() { return $('.okta-form-infobox-error'); }
+  get submit() { return $('[data-type="save"]'); }
 
-  async login (username, password) {
+  async login(username, password) {
     await this.username.setValue(username);
     await this.password.setValue(password);
     await this.submit.click();
-  }
-
-  async loginToSocialIdp(idp, username, password) {
-
   }
 
   async assertErrorMessage(errorMessage) {
     await waitForLoad(this.errorBox);
     await this.errorBox.then(el => el.getText()).then(txt => {
       expect(txt).toBe(errorMessage);
-    })
+    });
   }
 }
 

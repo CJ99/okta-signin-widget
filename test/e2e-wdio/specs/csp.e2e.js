@@ -47,5 +47,5 @@ describe('CSP', () => {
       await waitForLoad(TestAppPage.widget);
       expect(await TestAppPage.getCspErrors()).toBe('');
     });
-  })
+  });
 });

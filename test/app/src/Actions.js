@@ -1,10 +1,10 @@
-import React, { useRef, useContext, useState } from 'react';
+import React, { useRef, useContext } from 'react';
 import getOktaSignIn from './getOktaSignIn';
 import { AppContext } from './App';
 
 export default function WidgetUIActions() {
   const oktaSignInRef = useRef(null);
-  const { config, setTokens } = useContext(AppContext);
+  const { config, setTokens, setOidcError } = useContext(AppContext);
 
   const hide = () => {
     oktaSignInRef.current.hide();
@@ -21,7 +21,7 @@ export default function WidgetUIActions() {
 
   const start = async () => {
     const oktaSignIn = await getOktaSignIn(config);
-    oktaSignIn.on('afterError', function () {
+    oktaSignIn.on('afterError', function() {
       var errorBox = document.getElementsByClassName('okta-form-infobox-error infobox infobox-error')[0];
       // Update text in errorBox
       errorBox.children[1].innerText = 'Custom Error!';
@@ -58,14 +58,14 @@ export default function WidgetUIActions() {
     const oktaSignIn = await getOktaSignIn(config);
     oktaSignIn.renderEl(
       { el: '#okta-login-container' },
-      function (res) {
+      function(res) {
         if (res.status !== 'SUCCESS') {
           return;
         }
         setTokens(res.tokens);
         oktaSignIn.remove();
       },
-      function (err) {
+      function(err) {
         setOidcError(err);
       }
     );
@@ -76,7 +76,8 @@ export default function WidgetUIActions() {
 
   const triggerCspFail = () => {
     try {
-      eval("var cspTrigger = true;");
+      /* eslint-disable-next-line no-eval */
+      eval('var cspTrigger = true;');
     } catch (e) {
       console.warn(e);
     }

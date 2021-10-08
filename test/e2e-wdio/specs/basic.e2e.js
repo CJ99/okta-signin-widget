@@ -66,7 +66,7 @@ describe('Basic flows', () => {
     await TestAppPage.startButton.click();
     await waitForLoad(TestAppPage.widget);
     await PrimaryAuthPage.login('foo', 'bar');
-    await PrimaryAuthPage.assertErrorMessage('Custom Error!')
+    await PrimaryAuthPage.assertErrorMessage('Custom Error!');
   });
 
   it('has the style from config.colors', async () => {

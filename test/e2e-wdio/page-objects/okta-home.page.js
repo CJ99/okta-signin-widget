@@ -1,8 +1,8 @@
 class OktaHomePage {
-  get mainContent () { return $('.main-content') }
-  get username () { return $('[data-se=user-menu] .option-selected-text') }
+  get mainContent() { return $('.main-content'); }
+  get username() { return $('[data-se=user-menu] .option-selected-text'); }
 
-  async waitForPageLoad () {
+  async waitForPageLoad() {
     await browser.waitUntil(async () => {
       const currentUrl = await browser.getUrl();
       return currentUrl.includes('/app/UserHome');
@@ -10,7 +10,7 @@ class OktaHomePage {
     await browser.waitUntil(async () => this.mainContent.then(el => el.isDisplayed()), 5000, 'wait for mainContent');
   }
 
-  async getLoggedInUser () {
+  async getLoggedInUser() {
     await browser.waitUntil(async () => this.username.then(el => el.isDisplayed()), 5000, 'wait for mainContent');
     return this.username.getText();
   }
