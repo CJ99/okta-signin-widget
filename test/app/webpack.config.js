@@ -8,15 +8,17 @@ const DEV_SERVER_PORT = 3000;
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.js',
+  entry: path.resolve(__dirname, 'src/index.js'),
   output: {
     filename: '[name].bundle.js',
     path: path.join(__dirname, 'dist'),
     clean: true
   },
   resolve: {
+    extensions: ['.js'],
     alias: {
-      '@okta/okta-signin-widget': path.resolve(__dirname, '..', '..', 'dist/js/okta-sign-in.entry.js')
+      './getOktaSignIn': './getOktaSignIn_CDN',
+      // '@okta/okta-signin-widget': path.resolve(__dirname, 'target/js/okta-sign-in.entry.js'),
     }
   },
   module: {
@@ -37,9 +39,7 @@ module.exports = {
   devtool: 'source-map',
   devServer: {
     static: [
-      {
-        directory: path.resolve(__dirname, '..', '..', 'dist')
-      },
+      path.resolve(__dirname, '..', '..', 'target'),
       {
         staticOptions: {
           watchContentBase: true
@@ -54,11 +54,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'public/index.html',
+      template: path.resolve(__dirname, 'public/index.html'),
       inject: false,
-      // templateParameters: {
-      //   OKTA_SIGN_IN: 'js/okta-sign-in.min.js',
-      // }
     }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(ENV.getValues())

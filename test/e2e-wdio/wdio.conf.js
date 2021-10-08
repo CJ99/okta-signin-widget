@@ -1,5 +1,8 @@
+const path = require('path');
 require('./env').config();
 
+const CI = process.env.CI;
+const logLevel = CI ? 'warn' : 'info';
 const browserOptions = {
     args: []
 };
@@ -16,6 +19,11 @@ if (process.env.CI) {
         '--disable-dev-shm-usage'
     ]);
 }
+
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '89.0.4389.23';
+const drivers = {
+    chrome: { version: CHROMEDRIVER_VERSION }
+};
 
 exports.config = {
     //
@@ -40,7 +48,7 @@ exports.config = {
     // will be called from there.
     //
     specs: [
-        './specs/**/*.e2e.js'
+        path.resolve(__dirname, 'specs/**/*.e2e.js')
     ],
     // Patterns to exclude.
     exclude: [
@@ -88,7 +96,7 @@ exports.config = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'info',
+    logLevel,
     //
     // Set specific log levels per logger
     // loggers:
@@ -112,7 +120,7 @@ exports.config = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
-    baseUrl: 'http://localhost',
+    baseUrl: 'http://localhost:3000',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
@@ -128,7 +136,16 @@ exports.config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: ['chromedriver'],
+    services: [
+        ['selenium-standalone', {
+            installArgs: {
+            drivers
+            },
+            args: {
+            drivers
+            }
+        }]
+    ],
     
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
@@ -150,10 +167,15 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
-    reporters: ['spec'],
-
-
-    
+    reporters: [
+        'spec',
+        ['junit', {
+            outputDir: '../../build2/reports/e2e',
+            outputFileFormat: function() { // optional
+                return 'junit-results.xml';
+            }
+        }]
+    ],
     //
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
