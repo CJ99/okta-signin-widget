@@ -9,7 +9,7 @@ setup_service yarn 1.21.1 /etc/pki/tls/certs/ca-bundle.crt
 
 cd ${OKTA_HOME}/${REPO}
 
-if ! yarn install ; then
+if ! yarn install --frozen-lockfile --ignore-scripts; then
   echo "yarn install failed! Exiting..."
   exit ${FAILED_SETUP}
 fi
