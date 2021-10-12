@@ -1,8 +1,10 @@
 #!/bin/bash
 export CI=true
-setup_service google-chrome-stable 87.0.4280.66-1
 
 source $OKTA_HOME/$REPO/scripts/setup.sh
+
+setup_service java 1.8.222
+setup_service google-chrome-stable 89.0.4389.72-1
 
 export TEST_SUITE_TYPE="junit"
 export TEST_RESULT_FILE_DIR="${REPO}/build2/reports/junit"
@@ -14,7 +16,7 @@ aws s3 --quiet --region us-east-1 cp s3://ci-secret-stash/prod/signinwidget/expo
 source $OKTA_HOME/$REPO/scripts/export-test-credentials.sh
 
 if ! yarn test:e2e:wdio; then
-  echo "e2e tests failed! Exiting..."
+  echo "e2e wdio tests failed! Exiting..."
   exit ${PUBLISH_TYPE_AND_RESULT_DIR_BUT_ALWAYS_FAIL}
 fi
 

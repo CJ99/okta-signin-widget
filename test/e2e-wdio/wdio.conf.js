@@ -21,7 +21,7 @@ if (process.env.CI) {
     ]);
 }
 
-const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '87.0.4280.88';
+const CHROMEDRIVER_VERSION = process.env.CHROMEDRIVER_VERSION || '89.0.4389.23';
 const drivers = {
     chrome: { version: CHROMEDRIVER_VERSION }
 };
@@ -84,7 +84,7 @@ exports.config = {
         // 5 instances get started at a time.
         maxInstances: 1, // all tests use the same user and local storage. they must run in series
         browserName: 'chrome',
-        port: 5555,
+        port: 5566,
         'goog:chromeOptions': browserOptions
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
@@ -145,7 +145,7 @@ exports.config = {
             },
             args: {
                 drivers,
-                seleniumArgs: ['-host', '127.0.0.1', '-port', '5555']
+                seleniumArgs: ['-host', '127.0.0.1', '-port', '5566']
             }
         }]
     ],
