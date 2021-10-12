@@ -160,10 +160,6 @@ export default BaseLoginRouter.extend({
     'verifyPIV',
   ],
 
-  idpDiscoveryCheck: function() {
-    this.render(ForceIDPDiscoveryController, { Beacon: SecurityBeacon });
-  },
-
   defaultAuth: function() {
     if (location.hash === `#${Enums.WIDGET_CONTAINER_ID}`) {
       document.getElementById(Enums.WIDGET_CONTAINER_ID).focus();
@@ -174,6 +170,10 @@ export default BaseLoginRouter.extend({
     } else {
       this.primaryAuth();
     }
+  },
+
+  idpDiscoveryCheck: function() {
+    this.render(ForceIDPDiscoveryController, { Beacon: SecurityBeacon });
   },
 
   idpDiscovery: function() {

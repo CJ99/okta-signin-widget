@@ -1,9 +1,9 @@
 {
-  "subject": "okta:acct:undefined",
+  "subject": "okta:acct:",
   "links": [
     {
-      "rel":"http://openid.net/specs/connect/1.0/issuer",
-      "href": "http://localhost:3000/sso/idps/OKTA?stateToken=00CazfnZW7EeVlIJoByKsUAdvMEcBvnN39We9ji5QL&login_hint=undefined#",
+      "rel": "http://openid.net/specs/connect/1.0/issuer",
+      "href": "http://localhost:3000/sso/idps/OKTA?stateToken=00Ddg8GSrkNXRGWnDg3TGN0MsZNIywG0ybVHb5WjrI&login_hint=#",
       "titles": {
         "und": "Okta IdP"
       },

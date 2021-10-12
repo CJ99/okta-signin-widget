@@ -764,10 +764,7 @@ export default Model.extend({
     forceIdpDiscovery: {
       deps: ['lastAuthResponse'],
       fn: function(res) {
-        if (res._embedded) {
-          return res._embedded.forceIdpDiscovery;
-        }
-        return false;
+        return !!(res._embedded && res._embedded.forceIdpDiscovery);
       },
     },
   },
