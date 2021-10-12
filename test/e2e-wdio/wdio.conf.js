@@ -84,6 +84,7 @@ exports.config = {
         // 5 instances get started at a time.
         maxInstances: 1, // all tests use the same user and local storage. they must run in series
         browserName: 'chrome',
+        port: 5555,
         'goog:chromeOptions': browserOptions
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
@@ -140,10 +141,11 @@ exports.config = {
     services: [
         ['selenium-standalone', {
             installArgs: {
-            drivers
+                drivers
             },
             args: {
-            drivers
+                drivers,
+                seleniumArgs: ['-host', '127.0.0.1', '-port', '5555']
             }
         }]
     ],
