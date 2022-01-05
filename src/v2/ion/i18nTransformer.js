@@ -144,7 +144,10 @@ const I18N_OVERRIDE_MAPPINGS = {
 
   'enroll-profile.userProfile.lastName': 'oie.user.profile.lastname',
   'enroll-profile.userProfile.firstName': 'oie.user.profile.firstname',
+  'enroll-profile.userProfile.countryCode': 'oie.user.profile.countryCode',
+  'enroll-profile.userProfile.timezone': 'oie.user.profile.timezone',
   'enroll-profile.userProfile.email': 'oie.user.profile.primary.email',
+  'profile-update.userProfile.secondEmail': 'oie.user.profile.secondary.email',
 
   'user-code.userCode': 'device.code.activate.label',
 
@@ -163,6 +166,13 @@ const I18N_OVERRIDE_MAPPINGS = {
   'api.factors.error.sms.invalid_phone': 'oie.phone.invalid',
   'app.ldap.password.reset.failed': 'errors.E0000017',
   'oie.selfservice.unlock_user.challenge.failed.permissions': 'errors.E0000006',
+  'core.auth.factor.signedNonce.error.invalidEnrollment': 'core.auth.factor.signedNonce.error',
+  'core.auth.factor.signedNonce.error.invalidFactor': 'core.auth.factor.signedNonce.error',
+  'core.auth.factor.signedNonce.error.deletedDevice': 'core.auth.factor.signedNonce.error',
+  'core.auth.factor.signedNonce.error.invalidDeviceStatus': 'core.auth.factor.signedNonce.error.invalidDevice',
+
+  // re-map autoPush: Send push automatically for mock authenticator-verification-okta-verify-push-autoChallenge-on
+  'challenge-poll.okta_verify.autoChallenge': 'autoPush'
 };
 
 const I18N_PARAMS_MAPPING = {

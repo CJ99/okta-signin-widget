@@ -44,6 +44,10 @@ export default Model.extend({
       value: 'auto',
     },
 
+    // allows bootstrapping the Widget into a specific view such
+    // as register or forgot password
+    flow: ['string', false, 'default'],
+
     // Function to transform the username before passing it to the API
     // for Primary Auth, Forgot Password and Unlock Account.
     transformUsername: ['function', false],
@@ -100,6 +104,7 @@ export default Model.extend({
     'features.showPasswordRequirementsAsHtmlList': ['boolean', false, false],
     'features.mfaOnlyFlow': ['boolean', false, false],
     'features.scrollOnError': ['boolean', false, true],
+    'features.showKeepMeSignedIn': ['boolean', false, true],
     
     defaultCountryCode: ['string', false, 'US'],
 
@@ -115,6 +120,7 @@ export default Model.extend({
     },
 
     // OAUTH2
+    issuer: 'string',
     clientId: 'string',
     redirectUri: 'string',
     state: 'string',
@@ -165,6 +171,9 @@ export default Model.extend({
 
     //PIV
     piv: ['object', false, {}],
+
+    //Email verify callback
+    stateTokenExternalId: 'string'
   },
 
   derived: {
@@ -188,10 +197,14 @@ export default Model.extend({
       cache: true,
     },
     supportedLanguages: {
-      deps: ['i18n'],
-      fn: function(i18n) {
+      deps: ['i18n', 'language'],
+      fn: function(i18n, language) {
         // Developers can pass in their own languages
-        return _.union(config.supportedLanguages, _.keys(i18n));
+        return _.union(
+          config.supportedLanguages, 
+          _.keys(i18n), 
+          _.isString(language) ? [language] : []
+        );
       },
       cache: true,
     },
@@ -336,13 +349,28 @@ export default Model.extend({
         return !_.isEmpty(configuredSocialIdps) || !_.isEmpty(customButtons) || hasPivCard;
       },
       cache: true,
-    },
+    }
   },
 
   initialize: function(options) {
-    if (!options.baseUrl) {
+    let { baseUrl, colors } = options;
+    if (!baseUrl) {
+      // infer baseUrl from the issuer
+      const { authClient } = options;
+      if (authClient) {
+        baseUrl = authClient.getIssuerOrigin();
+      } else {
+        // issuer can be passed at top-level or in authParams
+        let { issuer, authParams } = options;
+        issuer = issuer || authParams?.issuer;
+        baseUrl = issuer?.split('/oauth2/')[0];
+      }
+      this.set('baseUrl', baseUrl);
+    }
+
+    if (!baseUrl) {
       this.callGlobalError(new ConfigError(loc('error.required.baseUrl')));
-    } else if (options.colors && _.isString(options.colors.brand) && !options.colors.brand.match(/^#[0-9A-Fa-f]{6}$/)) {
+    } else if (colors && _.isString(colors.brand) && !colors.brand.match(/^#[0-9A-Fa-f]{6}$/)) {
       this.callGlobalError(new ConfigError(loc('error.invalid.colors.brand')));
     } else if (BrowserFeatures.corsIsNotSupported()) {
       this.callGlobalError(new UnsupportedBrowserError(loc('error.unsupported.cors')));

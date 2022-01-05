@@ -11,9 +11,12 @@
  */
 
 import Errors from 'util/Errors';
+import { emailVerifyCallback } from './emailVerifyCallback';
 import { interact } from './interact';
 import { introspect } from './introspect';
 import sessionStorageHelper from './sessionStorageHelper';
+import { getSavedTransactionMeta } from './transactionMeta';
+import { CONFIGURED_FLOW } from './constants';
 
 const handleProxyIdxResponse = async (settings) => {
   return Promise.resolve({
@@ -23,6 +26,7 @@ const handleProxyIdxResponse = async (settings) => {
   });
 };
 
+/* eslint max-depth: [2, 3] */
 export async function startLoginFlow(settings) {
   // Return a preset response
   if (settings.get('proxyIdxResponse')) {
@@ -33,8 +37,23 @@ export async function startLoginFlow(settings) {
     sessionStorageHelper.removeStateHandle();
   }
 
-  // Use interaction code flow, if enabled
+  if (settings.get('stateTokenExternalId')) {
+    return emailVerifyCallback(settings);
+  }
+
   if (settings.get('useInteractionCodeFlow')) {
+    // if the configured flow is set to `proceed`, the SIW should only continue an existing idx transaction
+    // if the SIW loads from a fresh state (there is no current transaction), throw an error
+    const configuredFlow = settings.get('flow');
+    if (configuredFlow && configuredFlow === CONFIGURED_FLOW.PROCEED) {
+      const meta = await getSavedTransactionMeta(settings);
+      if (!meta) {
+        throw new Errors.ConfiguredFlowError(
+          'Unable to proceed: saved transaction could not be loaded', configuredFlow
+        );
+      }
+    }
+
     return interact(settings);
   }
 

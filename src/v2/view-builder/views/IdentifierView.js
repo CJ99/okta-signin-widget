@@ -1,4 +1,4 @@
-import { loc, createCallout } from 'okta';
+import { loc } from 'okta';
 import { FORMS as RemediationForms } from '../../ion/RemediationConstants';
 import { BaseForm, BaseView, createIdpButtons, createCustomButtons } from '../internals';
 import DeviceFingerprinting from '../utils/DeviceFingerprinting';
@@ -94,18 +94,6 @@ const Body = BaseForm.extend({
     }
   },
 
-  showMessages() {
-    const messagesObj = this.options.appState.get('messages');
-    if (messagesObj?.value.length
-        && this.options.appState.get('currentFormName') === 'identify') {
-      const displayMessageObj = messagesObj.value[0];
-      const messageCallout = createCallout({
-        content: displayMessageObj.message,
-        type: (displayMessageObj.class || '').toLowerCase(),
-      });
-      this.introspectMessage = this.add(messageCallout, '.o-form-error-container').last();
-    }
-  },
   /**
    * Update UI schemas for customization from .widgetrc.js or Admin Customization settings page.
    * @returns Array
@@ -117,7 +105,7 @@ const Body = BaseForm.extend({
     const identifierExplainLabeli18nKey = 'primaryauth.username.tooltip';
     const passwordExplainLabeli18nKey = 'primaryauth.password.tooltip';
 
-    const newSchemas = schemas.map(schema => {
+    let newSchemas = schemas.map(schema => {
       let newSchema = { ...schema };
 
       if (schema.name === 'identifier') {
@@ -147,6 +135,12 @@ const Body = BaseForm.extend({
 
       return newSchema;
     });
+
+    // If showKeepMeSignedIn is explicitly set to false, we ensure we don't display
+    // the "Keep me signed in" checkbox
+    if (this.settings.get('features.showKeepMeSignedIn') === false) {
+      newSchemas = newSchemas.filter(schema => schema.name !== 'rememberMe');
+    }
 
     return newSchemas;
   },
@@ -205,6 +199,31 @@ const Body = BaseForm.extend({
 
 export default BaseView.extend({
   Body,
+
+  createModelClass() {
+    const ModelClass = BaseView.prototype.createModelClass.apply(this, arguments);
+    
+    // customize pre-submit form validation inline error messages
+    const identifierRequiredi18nKey = 'error.username.required';
+    const passwordRequiredi18nKey = 'error.password.required';
+    const props = ModelClass.prototype.props;
+    const validate = (attr) => {
+      const inlineErrors = {};
+      const isEmptyIdentifier = props['identifier'] && !attr?.['identifier'];
+      const isEmptyPassword = props['credentials.passcode'] && !attr?.['credentials.passcode'];
+      if (isEmptyIdentifier && isCustomizedI18nKey(identifierRequiredi18nKey, this.settings)) {
+        inlineErrors['identifier'] = loc(identifierRequiredi18nKey, 'login');
+      }
+      if (isEmptyPassword && isCustomizedI18nKey(passwordRequiredi18nKey, this.settings)) {
+        inlineErrors['credentials.passcode'] = loc(passwordRequiredi18nKey, 'login');
+      }
+      return inlineErrors;
+    };
+
+    return ModelClass.extend({
+      validate
+    });
+  },
 
   initialize() {
     // Override Footer by overriding showForgotPasswordLink method

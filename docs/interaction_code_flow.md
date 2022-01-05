@@ -50,6 +50,7 @@
     - [features.showPasswordToggleOnSignInPage](#featuresshowpasswordtoggleonsigninpage)
     - [features.hideSignOutLinkInMFA](#featureshidesignoutlinkinmfa)
     - [features.rememberMe](#featuresrememberme)
+  - [Flow](#flow)
 
 ## Setup
 
@@ -132,7 +133,7 @@ There are many different ways the Okta Sign-In Widget can be customized.
 
 #### logoText
 
-  Text for `alt` attribute of the logo image, logo text will only show up when logo image is not avaiable
+  Text for `alt` attribute of the logo image, logo text will only show up when logo image is not available
 
 ```javascript
 // Text to describe the logo
@@ -597,3 +598,32 @@ Enable or disable widget functionality with the following options.
 
   Defaults to `true`.
   Pre-fills the identifier field with the previously used username.
+
+### Flow
+The Okta Sign-In Widget will either proceed with a current flow or start a new authenticate flow by default. This option allows bootstrapping the widget into a specific view such as register, unlock, or reset password. The widget can be used in particular pages such as login, reset-password, and unlock pages with the appropriate value set in the `flow` config option  
+
+_Note: These views will not work unless the admin has configured the org to allow these operations
+(example: if Profile Enrollment (User sign-up) in the admin console is not enabled, `flow: 'signup'` will
+not result in a registration view)_
+
+```javascript
+// login.html
+new OktaSignIn({
+  flow: 'login'
+});
+
+// signup.html
+new OktaSignIn({
+  flow: 'signup'
+});
+
+// reset_password.html
+new OktaSignIn({
+  flow: 'resetPassword'
+});
+
+// unlock_account.html
+new OktaSignIn({
+  flow: 'unlockAccount'
+});
+```

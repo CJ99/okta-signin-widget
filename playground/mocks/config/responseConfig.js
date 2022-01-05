@@ -7,14 +7,18 @@ const idx = {
   '/oauth2/default/.well-known/openid-configuration': [
     'well-known-openid-configuration'
   ],
-
   '/oauth2/default/v1/interact': [
     'interact'
     // 'error-feature-not-enabled'
   ],
+  '/oauth2/default/v1/token': [
+    'error-token-invalid-grant-pkce'
+  ],
 
   '/idp/idx/introspect': [
     'identify',
+    // 'authenticator-enroll-ov-qr-enable-biometrics',
+    // 'authenticator-verification-okta-verify-push',
     // 'error-401-invalid-otp-passcode',
     // 'error-with-failure-redirect',
     // 'error-feature-not-enabled',
@@ -23,6 +27,7 @@ const idx = {
     // 'error-403-security-access-denied',
     // 'error-session-expired',
     // 'error-password-reset-failed',
+    // 'error-identify-with-only-one-third-party-idp',
     // 'authenticator-enroll-email',
     // 'error-internal-server-error',
     // 'authenticator-enroll-password',
@@ -73,6 +78,7 @@ const idx = {
     // 'identify-with-app-link',
     // 'success',
     // 'success-with-app-user',
+    // 'success-with-interaction-code'
     // 'terminal-return-email',
     // 'terminal-return-error-email',
     // 'terminal-return-expired-email',
@@ -108,6 +114,7 @@ const idx = {
     // 'terminal-device-not-activated',
     // 'success-with-interaction-code',
     // 'error-with-failure-redirect',
+    // 'error-unsupported-idx-response'
   ],
   '/idp/idx/challenge/answer': [
     // 'error-401-invalid-otp-passcode',
@@ -143,6 +150,9 @@ const idx = {
     // 'authenticator-verification-okta-verify-push',
     // 'authenticator-verification-custom-app-push',
     // 'authenticator-verification-custom-app-push-reject',
+    // 'authenticator-enroll-ov-sms-enable-biometrics',
+    // 'okta-verify-version-upgrade',
+    // 'okta-verify-uv-verify-enable-biometrics'
   ],
   '/idp/idx/challenge': [
     // 'authenticator-verification-webauthn',
@@ -162,6 +172,7 @@ const idx = {
   ],
   '/idp/idx/recover': [
     'error-forgot-password',
+    'authenticator-reset-password'
   ],
   '/idp/idx/activate': [
     'identify-with-password',
@@ -385,6 +396,18 @@ const androidAuthnLoopbackFailfast = {
   ],
 };
 
+const identifierAndroidAppLink = {
+  '/idp/idx/introspect': [
+    'identify-with-device-probing-loopback-challenge-not-received',
+  ],
+  '/idp/idx/authenticators/poll': [
+    'identify-with-app-link',
+  ],
+  '/idp/idx/authenticators/okta-verify/launch': [
+    'identify-with-app-link',
+  ]
+};
+
 // user verification: Windows/Android authenticator with loopback server
 const userVerificationLoopback = {
   '/idp/idx/introspect': [
@@ -398,6 +421,26 @@ const userVerificationLoopback = {
   ],
 };
 
+// user verification: loopback with biometrics error for Windows/MacOS
+const userVerificationDesktopLoopbackBiometricsError = {
+  '/idp/idx/introspect': [
+    'authenticator-verification-okta-verify-signed-nonce-loopback'
+  ],
+  '/idp/idx/authenticators/poll': [
+    'error-okta-verify-uv-fastpass-verify-enable-biometrics-desktop',
+  ],
+};
+
+// user verification: loopback with biometrics error for Android
+const userVerificationMobileLoopbackBiometricsError = {
+  '/idp/idx/introspect': [
+    'authenticator-verification-okta-verify-signed-nonce-loopback'
+  ],
+  '/idp/idx/authenticators/poll': [
+    'error-okta-verify-uv-fastpass-verify-enable-biometrics-mobile',
+  ],
+};
+
 // user verification: Windows authenticator with custom URI
 const userVerificationCustomUri = {
   '/idp/idx/introspect': [
@@ -408,6 +451,22 @@ const userVerificationCustomUri = {
   ],
   '/idp/idx/authenticators/okta-verify/launch': [
     'authenticator-verification-okta-verify-signed-nonce-custom-uri',
+  ]
+};
+
+// user verification: Android authenticator with app link
+const userVerificationAppLink = {
+  '/idp/idx/introspect': [
+    'identify-with-device-probing-loopback-challenge-not-received',
+  ],
+  '/idp/idx/identify': [
+    'authenticator-verification-okta-verify-signed-nonce-app-link',
+  ],
+  '/idp/idx/authenticators/poll': [
+    'authenticator-verification-okta-verify-signed-nonce-app-link',
+  ],
+  '/idp/idx/authenticators/okta-verify/launch': [
+    'authenticator-verification-okta-verify-signed-nonce-app-link',
   ]
 };
 
@@ -493,7 +552,16 @@ const ovTotpError = {
   ],
   '/idp/idx/challenge/answer': [
     'error-okta-verify-totp',
-    // 'error-okta-verify-uv-totp-verify-enable-biometrics',
+    //'error-okta-verify-uv-totp-verify-enable-biometrics',
+  ],
+};
+
+const totpEnableBiometrics = {
+  '/idp/idx/introspect': [
+    'authenticator-verification-okta-verify-totp'
+  ],
+  '/idp/idx/challenge/answer': [
+    'error-okta-verify-uv-totp-verify-enable-biometrics',
   ],
 };
 
@@ -825,7 +893,7 @@ const secondaryEmail = {
   '/idp/idx/identify': [
     'enroll-profile-update-params',
     'enroll-profile-update-all-optional-params',
-    'error-enroll-profile-update-params'
+    'enroll-profile-update-params'
   ],
   '/idp/idx/skip': [
     'success-with-app-user'
@@ -833,6 +901,63 @@ const secondaryEmail = {
   '/idp/idx/enroll/new': [
     'success-with-app-user'
   ]
+};
+
+const selfServiceRegistration = {
+  '/api/v1/authn': [
+    'success-001',
+  ],
+  '/api/v1/registration/form': [
+    'form',
+  ],
+  '/api/v1/registration/:id/register': [
+    'register',
+  ]
+};
+
+const oktaVerifyPushNotification = {
+  '/idp/idx/introspect': [
+    'identify-with-password',
+  ],
+  '/idp/idx/identify': [
+    'authenticator-verification-select-authenticator-without-signed-nonce',
+  ],
+  '/idp/idx/challenge': [
+    'authenticator-verification-okta-verify-push-autoChallenge-on',
+  ],
+  '/idp/idx/authenticators/poll': [
+    'authenticator-verification-okta-verify-push-autoChallenge-on',
+  ],
+};
+
+const rememberLastUsedOktaVerify = {
+  '/idp/idx/introspect': [
+    'identify-with-password',
+  ],
+  '/idp/idx/identify': [
+    'authenticator-verification-data-okta-verify-push-autoChallenge-off',
+  ],
+  '/idp/idx/challenge': [
+    'authenticator-verification-okta-verify-push-autoChallenge-on',
+  ],
+  '/idp/idx/authenticators/poll': [
+    'authenticator-verification-okta-verify-push-autoChallenge-on',
+  ],
+};
+
+const selectOktaVerifyMethod = {
+  '/idp/idx/introspect': [
+    'identify-with-password',
+  ],
+  '/idp/idx/identify': [
+    'authenticator-verification-data-ov-only-without-device-known',
+  ],
+  '/idp/idx/challenge': [
+    'authenticator-verification-okta-verify-push-autoChallenge-on',
+  ],
+  '/idp/idx/authenticators/poll': [
+    'authenticator-verification-okta-verify-push-autoChallenge-on',
+  ],
 };
 
 module.exports = {

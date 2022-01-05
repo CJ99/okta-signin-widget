@@ -268,6 +268,11 @@ fn.handleResponseStatus = function(router, res) {
       router.navigate(factorURL, { trigger: true });
       return;
     }
+    // Or we're in device flow and we need to force idp discovery check
+    if (router.appState.get('usingDeviceFlow')) {
+      router.navigate('signin/idp-discovery-check', { trigger: true });
+      return;
+    }
     // Or we don't have anything and we need to show the login page
     router.navigate('', { trigger: true });
     return;

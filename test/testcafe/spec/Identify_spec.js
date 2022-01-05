@@ -8,10 +8,15 @@ import xhrAuthenticatorVerifySelect from '../../../playground/mocks/data/idp/idx
 import xhrAuthenticatorOVTotp from '../../../playground/mocks/data/idp/idx/authenticator-verification-okta-verify-totp';
 import config from '../../../src/config/config.json';
 
-
 const baseIdentifyMock = RequestMock()
   .onRequestTo('http://localhost:3000/idp/idx/introspect')
   .respond(xhrIdentify);
+
+const identifyMockWithUnsupportedResponseError = RequestMock()
+  .onRequestTo('http://localhost:3000/idp/idx/introspect')
+  .respond(xhrIdentify)
+  .onRequestTo('http://localhost:3000/idp/idx/identify')
+  .respond({}, 403);
 
 const identifyMock = RequestMock()
   .onRequestTo('http://localhost:3000/idp/idx/introspect')
@@ -135,6 +140,49 @@ test.requestHooks(identifyMock)('should show errors if required fields are empty
 
   await t.expect(identityPage.hasIdentifierError()).eql(true);
   await t.expect(identityPage.hasIdentifierErrorMessage()).eql(true);
+  await t.expect(identityPage.getIdentifierErrorMessage()).eql('This field cannot be left blank');
+});
+
+test.requestHooks(identifyMockWithUnsupportedResponseError)('should show error if server response is unsupported', async t => {
+  const identityPage = await setup(t);
+  await identityPage.fillIdentifierField('test');
+  await identityPage.clickNextButton();
+  await identityPage.waitForErrorBox();
+  await t.expect(identityPage.getErrorBoxText()).eql('There was an unsupported response from server.');
+});
+
+test.requestHooks(identifyMock)('should show customized error if required field identifier is empty', async t => {
+  const identityPage = await setup(t);
+  await rerenderWidget({
+    i18n: {
+      en: {
+        'error.username.required': 'Username is required!',
+      }
+    }
+  });
+
+  await identityPage.clickNextButton();
+  await identityPage.waitForErrorBox();
+
+  await t.expect(identityPage.hasIdentifierError()).eql(true);
+  await t.expect(identityPage.hasIdentifierErrorMessage()).eql(true);
+  await t.expect(identityPage.getIdentifierErrorMessage()).eql('Username is required!');
+});
+
+test.requestHooks(identifyRequestLogger, identifyMock)('should not show custom error if password doesn\'t exist in remediation', async t => {
+  const identityPage = await setup(t);
+  await rerenderWidget({
+    i18n: {
+      en: {
+        'error.username.required': 'Username is required!',
+        'error.password.required': 'Password is required!',
+      }
+    }
+  });
+
+  await identityPage.fillIdentifierField('test');
+  await identityPage.clickNextButton();
+  await t.expect(identifyRequestLogger.count(() => true)).eql(1);
 });
 
 test.requestHooks(identifyMock)('should have correct display text', async t => {
@@ -316,4 +364,35 @@ test.requestHooks(identifyRequestLogger, baseIdentifyMock)('should pre-populate 
   // Ensure identifier field is pre-filled
   const identifier = identityPage.getIdentifierValue();
   await t.expect(identifier).eql('myTestUsername@okta.com');
+});
+
+test.requestHooks(identifyRequestLogger, baseIdentifyMock)('should hide "Keep me signed in" checkbox with config', async t => {
+  const identityPage = await setup(t);
+  await rerenderWidget({
+    features: { showKeepMeSignedIn: false }
+  });
+
+  // Ensure checkbox is hidden
+  const doesCheckboxExist = identityPage.identifierFieldExists('.custom-checkbox [name="rememberMe"');
+  await t.expect(doesCheckboxExist).eql(false);
+});
+
+test.requestHooks(identifyRequestLogger, baseIdentifyMock)('should show "Keep me signed in" checkbox with config or by default', async t => {
+  const identityPage = await setup(t);
+  await rerenderWidget({
+    features: {}
+  });
+
+  // Ensure checkbox is shown
+  let doesCheckboxExist = identityPage.identifierFieldExists('.custom-checkbox [name="rememberMe"');
+  await t.expect(doesCheckboxExist).eql(true);
+
+
+  await rerenderWidget({
+    features: { showKeepMeSignedIn: true }
+  });
+
+  // Ensure checkbox is shown
+  doesCheckboxExist = identityPage.identifierFieldExists('.custom-checkbox [name="rememberMe"');
+  await t.expect(doesCheckboxExist).eql(true);
 });

@@ -761,6 +761,18 @@ export default Model.extend({
         return res._embedded.deviceActivationStatus;
       },
     },
+    usingDeviceFlow: {
+      deps: ['lastAuthResponse'],
+      fn: function(res) {
+        return !!(res._embedded && res._embedded.usingDeviceFlow);
+      },
+    },
+    userCode: {
+      deps: ['lastAuthResponse'],
+      fn: function(res) {
+        return res?._embedded?.userCode;
+      },
+    },
   },
 
   parse: function(options) {

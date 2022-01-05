@@ -30,6 +30,7 @@ import {
   startLoginFlow,
   interactionCodeFlow,
   configIdxJsClient,
+  handleConfiguredFlow
 } from './client';
 
 import transformIdxResponse from './ion/transformIdxResponse';
@@ -38,6 +39,7 @@ import CookieUtil from 'util/CookieUtil';
 
 export default Router.extend({
   Events: Backbone.Events,
+  hasControllerRendered: false,
 
   initialize: function(options) {
     // Create a default success and/or error handler if
@@ -90,7 +92,7 @@ export default Router.extend({
 
   async handleUpdateAppState(idxResponse) {
     // Only update the cookie when the user has successfully authenticated themselves 
-    // to avoid incorrect/uneccessary updates.
+    // to avoid incorrect/unnecessary updates.
     if (this.hasAuthenticationSucceeded(idxResponse) 
       && this.settings.get('features.rememberMyUsernameOnOIE')) {
       this.updateIdentifierCookie(idxResponse);
@@ -184,10 +186,11 @@ export default Router.extend({
       return this.handleUpdateAppState(error.details);
     }
 
-    // assume it's a config error
-    this.settings.callGlobalError(new Errors.ConfigError(
-      error
-    ));
+    // If the error is a string, wrap it in an Error object
+    if (typeof error === 'string') {
+      error = new Error(error);
+    }
+    this.settings.callGlobalError(error);
 
     // -- TODO: OKTA-244631 How to surface up the CORS error in IDX?
     // -- The `err` object from idx.js doesn't have XHR object
@@ -198,7 +201,7 @@ export default Router.extend({
     // }
   },
 
-  /* eslint max-statements: [2, 22] */
+  /* eslint max-statements: [2, 25], complexity: [2, 11] */
   render: async function(Controller, options = {}) {
     // If url changes then widget assumes that user's intention was to initiate a new login flow,
     // so clear stored token to use the latest token.
@@ -223,7 +226,12 @@ export default Router.extend({
     // state token (which will be set into AppState)
     if (this.settings.get('oieEnabled')) {
       try {
-        const idxResp = await startLoginFlow(this.settings);
+        let idxResp = await startLoginFlow(this.settings);
+        /* eslint-disable max-depth */
+        if (this.settings.get('flow') && !this.hasControllerRendered) {
+          idxResp = await handleConfiguredFlow(idxResp, this.settings);
+        }
+        /* eslint-enable max-depth */
         this.appState.trigger('updateAppState', idxResp);
       } catch (errorResp) {
         this.appState.trigger('remediationError', errorResp.error || errorResp);
@@ -258,6 +266,8 @@ export default Router.extend({
     this.listenTo(this.controller, 'all', this.trigger);
 
     this.controller.render();
+
+    this.hasControllerRendered = true;
   },
 
   /**

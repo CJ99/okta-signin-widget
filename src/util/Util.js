@@ -107,7 +107,7 @@ Util.toLower = function(strings) {
 };
 
 // A languageCode can be composed of multiple parts, i.e:
-// {{langage}}-{{region}}-{{dialect}}
+// {{language}}-{{region}}-{{dialect}}
 //
 // In these cases, it's necessary to generate a list of other possible
 // combinations that we might support (in preferred order).
@@ -141,6 +141,10 @@ Util.callAfterTimeout = function(callback, time) {
 // that are logged when in development mode.
 Util.debugMessage = function(message) {
   Logger.warn(`\n${message.replace(/^(\s)+/gm, '')}`);
+};
+
+Util.logConsoleError = function(message) {
+  Logger.error(message);
 };
 
 // Trigger an afterError event
